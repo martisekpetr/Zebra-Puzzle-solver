@@ -1,0 +1,393 @@
+% !TEX TS-program = pdflatex
+% !TEX encoding = UTF-8 Unicode
+
+% This is a simple template for a LaTeX document using the "article" class.
+% See "book", "report", "letter" for other types of document.
+
+\documentclass[11pt]{article} % use larger type; default would be 10pt
+
+\usepackage[utf8]{inputenc} % set input encoding (not needed with XeLaTeX)
+\usepackage[czech]{babel}
+\usepackage{framed}
+
+%%% Examples of Article customizations
+% These packages are optional, depending whether you want the features they provide.
+% See the LaTeX Companion or other references for full information.
+
+%%% PAGE DIMENSIONS
+\usepackage{geometry} % to change the page dimensions
+\geometry{a4paper} % or letterpaper (US) or a5paper or....
+\geometry{margin=1in} % for example, change the margins to 2 inches all round
+% \geometry{landscape} % set up the page for landscape
+%   read geometry.pdf for detailed page layout information
+
+\usepackage{graphicx} % support the \includegraphics command and options
+
+% \usepackage[parfill]{parskip} % Activate to begin paragraphs with an empty line rather than an indent
+
+%%% PACKAGES
+\usepackage{hyperref}
+\usepackage{booktabs} % for much better looking tables
+\usepackage{array} % for better arrays (eg matrices) in maths
+\usepackage{paralist} % very flexible & customisable lists (eg. enumerate/itemize, etc.)
+\usepackage{verbatim} % adds environment for commenting out blocks of text & for better verbatim
+\usepackage{subfig} % make it possible to include more than one captioned figure/table in a single float
+% These packages are all incorporated in the memoir class to one degree or another...
+
+%%% HEADERS & FOOTERS
+\usepackage{fancyhdr} % This should be set AFTER setting up the page geometry
+\pagestyle{fancy} % options: empty , plain , fancy
+\renewcommand{\headrulewidth}{0pt} % customise the layout...
+\lhead{}\chead{}\rhead{}
+\lfoot{}\cfoot{\thepage}\rfoot{}
+
+%%% SECTION TITLE APPEARANCE
+\usepackage{sectsty}
+\allsectionsfont{\sffamily\mdseries\upshape} % (See the fntguide.pdf for font help)
+% (This matches ConTeXt defaults)
+
+%%% ToC (table of contents) APPEARANCE
+\usepackage[nottoc,notlof,notlot]{tocbibind} % Put the bibliography in the ToC
+\usepackage[titles,subfigure]{tocloft} % Alter the style of the Table of Contents
+\renewcommand{\cftsecfont}{\rmfamily\mdseries\upshape}
+\renewcommand{\cftsecpagefont}{\rmfamily\mdseries\upshape} % No bold!
+
+\setlength{\parindent}{1cm}
+
+%%% END Article customizations
+
+%%% The "real" document content comes below...
+
+
+
+\title{Zebra Solver - Dokumentace}
+\author{The Author}
+\date{} % Activate to display a given date or no date (if empty),
+         % otherwise the current date is printed 
+
+\begin{document}
+\newcommand{\HRule}{\rule{\linewidth}{0.5mm}}
+% \maketitle
+\begin{titlepage}
+\begin{center}
+
+% Upper part of the page. The '~' is needed because \\
+% only works if a paragraph has started.
+
+~\\[3cm]
+
+\textsc{\LARGE Neprocedurální programování}\\[1.5cm]
+
+\textsc{\Large Dokumentace zápočtového programu \\ v jazyce Prolog}\\[1cm]
+
+% Title
+\HRule \\ [0.6cm]
+{ \huge \bfseries Zebra Solver}\\[0.4cm]
+
+\HRule \\[2.5cm]
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Autor:}\\
+ Petr \textsc{Martišek}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Cvičící:} \\
+ RNDr.~Rudolf \textsc{Kryl}
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+% Bottom of the page
+{\large \today}
+
+\end{center}
+\end{titlepage}
+
+\section{Anotace}
+
+Program Zebra Solver je aplikace sloužící k automatickému řešení tzv. Einsteinových hádanek, v angličtině rovněž \uv{grid puzzles}, často také označované slovem \uv{zebra}. Tato přezdívka vznikla na základě originálního zadání uveřejněného v časopise Life International roku 1962. Autorství je připisováno právě Albertu Einsteinovi.
+
+Naše aplikace umí vyřešit nejen tuto originální, ale de facto jakoukoliv hádanku tohoto typu, která splňuje jisté nároky na tvar podmínek (specifikováno níže). Tyto nároky jsou založeny na původním zadání a zobecněny tak, aby bylo možno řešit co největší spektrum hádanek.
+
+\section{Přesné zadání}
+Zobecněné znění problému, který program řeší, je následující: Existuje $N$ objektů. Tyto objekty jsou umístěny tak, že je lze jednoznačně očíslovat $1 .. N$ (např. domy stojící v řadě). Všechny objekty mají stejnou sadu $M$ vlastností. Každá vlastnost může nabývat celkem $N$ různých hodnot. Každý objekt nabývá u každé vlastnosti právě jedné hodnoty a žádné dva objekty nenabývají u žádné vlastnosti téže hodnoty. 
+
+\emph{Pozn.: Mezi vlastnosti je automaticky přidána vlastnost \emph{index}, která udává pořadí objektu v posloupnosti. Tuto vlastnost může uživatel používat při zadávání podmínek, aniž by ji musel explicitně specifikovat.}
+
+Dále je zadáno libovolné množství podmínek. Podmínky dávají omezení na distribuci hodnot jednotlivých vlastností a na pořadí objektů. Rozlišíme dva základní typy podmínek:
+\begin{enumerate}
+\item \textbf{unární podmínky} \\
+Tedy podmínky mluvící o jednom objektu. Formálně se jedná o výčet dvojic \emph{Vlastnost - Hodnota}, které musí u nějakého objektu v prostoru řešení platit současně. Počet dvojic může být libovolné číslo mezi 1 a $M$. 
+
+\emph{Příklady:} \\
+\uv{Angličan bydlí v červeném domě.}  $\rightarrow$ \emph{(Národnost -- Angličan, Barva -- Červená)}\\
+\uv{Ten, kdo kouří Marlboro, bydlí v modrém domě a chová kočku.} $\rightarrow$  \emph{(Cigarety -- Marlboro, Barva -- Modrá, Zvíře -- Kočka)} \\
+\uv{Někdo chová koně.} $\rightarrow$ \emph{(Zvíře -- Kůň)}
+\item \textbf{relační podmínky} \\
+Podmínky mluvící o vztahu několika objektů. Formálně jsou to dva výčty: První je výčet dvojic \emph{Vlastnost - Hodnota}, z nichž každá dvojice jednoznačně identifikuje nějaký objekt. Počet objektů, jejichž vztahy specifikujeme, je číslo mezi 1 a $N$ (nicméně délka prvního seznamu může teoreticky být až $N \times M$, protože některé dvojice mohou specifikovat týž objekt).
+
+Druhým argumentem této podmínky je výčet relací. Relace je libovolný $k$-ární predikát, kde $k$ je počet objektů v prvním výčtu, který bere jako argumenty $k$ objektů, kdy objekt je dán jako \emph{seznam hodnot, kterých nabývají jeho vlastnosti} (tedy seznam délky $M$).  
+
+\emph{Příklady:} \\
+\uv{Franouz bydlí hned vpravo vedle chovatele psa.} $\rightarrow$ \emph{((Národnost -- Francouz, Zvíře -- Pes), (JeSoused, Vpravo))}\\
+\uv{Modrý dům stojí na kraji řady.} $\rightarrow$ \emph{((Barva -- Modrá), (NaKraji))}\\
+\uv{Chovatel šneků bydlí mezi Němcem a kuřákem Chesterfieldek.} $\rightarrow$ \emph{((Zvíře -- Šneci, Národnost -- Němec, Cigarety -- Chesterfield), (BydlíMezi))} \\
+
+kde \emph{NaKraji} je unární, \emph{Soused} a \emph{Vpravo} jsou binární a \emph{BydlíMezi} je ternární predikát.
+\end{enumerate}
+
+\noindent Na závěr můžeme položit libovolné množství otázek na konkrétní hodnotu nějaké vlastnosti nějakého objektu. Otázka je formálně dvojice \emph{((Vlastnost -- Hodnota) -- Vlastnost)}, kde první položka, dvojice \emph{(Vlastnost -- Hodnota)}, určuje konkrétní objekt a druhá položka udává vlastnost, na jejíž hodnotu se u tohoto objektu ptáme. \\
+\emph{Příklad:} \\
+\uv{Jakou barvu má dům, v němž bydlí Němec?} $\rightarrow$ \emph{((Národnost -- Němec), Barva)}.
+
+\section{Formát vstupu}
+Program je spouštěn predikátem \texttt{zebra(+PocetObjektu, +Vlastnosti, +Podminky, +Otazky, -Odpovedi)}. Formát jednotlivých argumentů je následující:
+\begin{enumerate}
+\item \textbf{PocetObjektu} \\
+Libovolné přirozené číslo, udávající počet objektů.
+\item \textbf{Vlastnosti} \\
+Seznam vlastností objektů, jiné vlastnosti než zde uvedené nebudou v podmínkách rozpoznány. \\
+Např.: \texttt{[barva, narodnost,  zvire, cigarety, napoj]}
+\item \textbf{Podminky} \\
+Seznam podmínek v jednom z následujících formátů:
+\begin{enumerate}
+\item \textbf{unární podmínka} \\
+
+\hskip 20pt \texttt{podminka([(Vlastnost1, Hodnota1),(Vlastnost2, Hodnota2), \ldots ])}, \\
+
+kde \texttt{Vlastnost1, Vlastnost2,\ldots} jsou některé z vlastností uvedených v druhém argumentu predikátu \texttt{zebra} a \texttt{Hodnota1, Hodnota2,\ldots} jsou hodnoty, jichž mají tyto vlastnosti u nějakého objektu nabývat současně. Délka seznamu je celé číslo z intervalu $1 .. M$. Pokud se v seznamu pokusíme definovat pro tutéž vlastnost více různých hodnot, je to považováno za chybu a program zfailuje.  Pokud se v seznamu vyskytne vlastnost nedefinovaná v druhém argumentu predikátu \texttt{zebra}, program zfailuje. Výjimkou je zabudovaná vlastnost \texttt{index}.
+\item \textbf{relační podmínka} \\
+
+\hskip 20pt {\ttfamily podminka([(Vlastnost1, Hodnota1),(Vlastnost2, Hodnota2), \ldots ], 
+
+\hskip 20pt {[Relace1, Relace2, \ldots])}}, \\
+
+kde dvojice \texttt{(Vlastnost, Hodnota)} určují konkrétní objekty, pro něž musí platit všechny relace dané seznamem v druhém argumentu. Tento typ podmínek lze číst jako: \emph{Pro objekt, jehož \texttt{Vlastnost1} nabývá hodnoty \texttt{Hodnota1}, a objekt, jehož \texttt{Vlastnost2} nabývá hodnoty \texttt{Hodnota2}, (a objekt \ldots), platí vztah daný relací \texttt{Relace1} a současně vztah daný relací \texttt{Relace2} (a současně \ldots ).} 
+
+Arita použitých relací musí odpovídat délce seznamu v prvním argumentu. Před\-de\-finované relace jsou \texttt{soused/2, vpravo/2} a \texttt{vlevo/2.} Další relace je třeba uživatelsky definovat. Každá relace musí přijímat argumenty ve tvaru \texttt{[Hodnota0, Hodnota1, Hodnota2, Hodnota3, \ldots, HodnotaM]}, kde $M$ je celkový počet vlastností, \texttt{Hodnota0} odpovídá vlastnosti \texttt{index} a jednotlivé hodnoty $1 .. M$ odpovídají vlastnostem v pořadí, v jakém jsou definovány v druhém argumentu predikátu \texttt{zebra}. Jednotlivé položky seznamu jsou buď konkrétní hodnoty nebo volné proměnné. Tato struktura je vlastně interní reprezentací konkrétního objektu.
+\end{enumerate}
+\item \textbf{Otazky} \\
+Seznam otázek ve formátu:
+
+\hskip 70 pt \texttt{otazka((Vlastnost1, Hodnota1), Vlastnost2)}
+
+kde \texttt{Vlastnost1} a \texttt{Hodnota1} určují konkrétní objekt a \texttt{Vlastnost2} udává vlastnost, jejíž hodnota nás u tohoto objektu zajímá.
+\item \textbf{Odpovedi}\\
+Seznam hodnot, které jsou odpověďmi na otázky z předešlého argumentu. Délka tohoto seznamu musí být stejná, jako počet otázek. Během výpočtu se tento seznam naplní konkrétními hodnotami.
+\end{enumerate}
+
+\subsection{Příklad zadání}
+Ukažme si správný formát vstupu na příkladu. Následuje zadání originální originální hádanky (viz. např. \url{http://en.wikipedia.org/wiki/Zebra_Puzzle}) přepsáno do správného formátu: \\
+
+\texttt{zebra(} 
+\begingroup
+
+
+\leftskip=50pt
+{\ttfamily
+		   \noindent  5, \\
+		     {[color, pet, beverage, nationality, cigarets],}\\
+		    {[}\\
+		     podminka([(nationality, englishman),(color,red)]),\\
+		     podminka([(nationality,spaniard), (pet,dog)]),\\
+		     podminka([(color, green),(beverage, coffee)]),\\
+		     podminka([(nationality,ukrainian),(beverage, tea)]),\\
+		     podminka([(color, green),(color,ivory)], [soused,vpravo]),\\
+		     podminka([(cigarets,old\_gold),(pet, snails)]),\\
+		     podminka([(color,yellow),(cigarets, kools)]),\\
+		     podminka([(beverage, milk),(index, 3)]),\\
+		     podminka([(nationality, norwegian),(index,1)]),\\
+		     podminka([(cigarets,chesterfield),(pet,fox)], [soused]),\\
+		     podminka([(cigarets,kools),(pet,horse)],[soused]),\\
+		     podminka([(cigarets,lucky\_strike),(beverage, orange\_juice)]),\\
+		     podminka([(nationality,japanese),(cigarets, parliaments)]),\\
+		     podminka([(nationality,norwegian),(color,blue)],[soused])\\
+		   { ]},\\
+		    {[}\\
+		     otazka((pet,zebra), color),\\
+		     otazka((beverage, water), cigarets)\\
+		    ],\\
+		    {[O1,O2]}\\
+		     ).\\
+}
+\par
+\endgroup
+\noindent Po skončení programu se v proměnné \texttt{O1} bude nacházet barva domu, ve kterém je chována zebra, a v proměnné \texttt{O2} značka cigaret, jež kouří ten, kdo pije vodu.
+\section{Algoritmus}
+V prvním kroku vyextrahujeme z podmínek a z otázek jednotlivé částečné objekty. Připomeňme, že objekt je reprezentován jako seznam hodnot, přičemž částečným objektem nazveme takový objekt, jehož některé hodnoty jsou volné proměnné. Např. z podmínky \texttt{podminka([(nationality, englishman), (color,red)])} získáme částečný objekt \texttt{[red, \_, \_, englishman, \_]}, z pod\-mín\-ky \texttt{podminka([(nationality,norwegian), (color,blue)], [soused])} získáme dva čás\-teč\-né objekty \texttt{[\_, \_, \_, norwegian, \_]} a \texttt{[blue, \_, \_, \_, \_]}. Z otázky \texttt{otazka((pet, zebra), color)} získáme částečný objekt \texttt{[\_, zebra, \_, \_, \_]}. Současně upravujeme seznam podmínek a odstraňujeme všechny unární podmínky, neboť nám již k ničemu nebudou. Relační podmínky ponecháme, protože budeme potřebovat kontrolovat platnost všech příslušných relací.
+
+V druhém kroku sloučíme ty částečné objekty, jež se shodují v nějaké vlastnosti. Např. objekty \texttt{[blue, \_, tea, \_, \_]} a \texttt{[blue, \_, \_, englishman, \_]} sloučíme do jediného částečného objektu \texttt{[blue, \_, tea, englishman, \_]}, protože se shodují ve vlastnosti \texttt{color}.  Tato operace jednak zrychlí celý algoritmus, jednak zaručí, že ve výsledku nevzniknou dva různé objekty shodující se v nějaké vlastnosti a jednak odhalí nekorektní zadání, kdy by jednomu objektu bylo přiřazeno více hodnot téže vlastnosti. Příkladem takového chybného zadání je např. seznam podmínek ve tvaru: \\ 
+\texttt{ [\\
+\ldots, \\
+podminka([(nationality, englishman) , (color, red)]), \\ 
+\ldots, \\ 
+podminka([(nationality, englishman), (color,blue)]), \\ 
+\ldots \\
+]}. \\
+Podle hodnoty vlastnosti \texttt{nationality} by se zjevně mělo jednat o týž objekt, ale vlastnost \texttt{color} by pak musela nabývat dvou různých hodnot. Pro takovéto zadání program nehledá řešení a rovnou zfailuje.
+
+Ve třetím kroku si vytvoříme prázdnou tabulku $N \times M$, kde $N$ je výsledný počet objektů (daný prvním argumentem predikátu \texttt{zebra}) a $M$ počet vlastností. Do této tabulky budeme postupně dosazovat částečné objekty z redukovaného seznamu získaného v druhém kroku. Zde využíváme dvou základních stavebních kamenů Prologu -- unifikace a backtrackingu. Ze seznamu částečných objektů vezmeme první v pořadí, odstraníme jej ze seznamu a pokusíme se jej unifikovat s některým řádkem tabulky. Objekty jsou seznamy, tudíž je lze unifikovat tehdy, pokud lze unifikovat všechny odpovídající prvky těchto seznamů. Těmito prvky jsou hodnoty jednotlivých vlastností a ty lze unifikovat tehdy, pokud je alespoň jedna z hodnot volná proměnná nebo pokud jsou hodnoty shodné. Pokud se nám unifikace podaří, ověříme platnost podmínek a pokračujeme dalším objektem ze seznamu. Pokud se unifikace či ověření podmínek nepodaří, backtrackujeme. Tedy zkusíme nalézt jiné umístění pro předchozí umístěný objekt, případně objekt před ním atd. 
+
+Ověření podmínek probíhá při každém přidání nějakého částečného objektu do tabulky. Postupně procházíme seznam podmínek, pro každou jednotlivou podmínku najdeme v tabulce objekty, jichž se týká (pokud už v tabulce jsou), a zavoláme na ně příslušné predikáty pomocí procedury \emph{apply/2}.
+
+Program nalezne postupně všechna možná řešení (pokud si je uživatel vyžádá stiskem středníku). Procházíme tedy celý stavový strom, ořezaný podmínkami. Stavový strom je $N$-ární a má hloubku $P$, kde $P$ je délka redukovaného seznamu částečných objektů získaných z podmínek a otázek. Tedy pro každý částečný objekt ze seznamu máme na výběr $N$ řádků tabulky, kam jej můžeme zkusit umístit, pro další objekt opět $N$ možností atd. pro všechny částečné objekty. Počet stavů, do kterých se dostaneme, lze tedy shora odhadnout jako $N^P$. V~každém stavu proběhne pokus o unifikaci v čase $O(M)$ a ověření podmínek v čase $O(Q \times A \times N \times M)$, kde $Q$ je počet relačních podmínek, $A$ je horní odhad arity relací, $N$ reprezentuje hledání objektu v tabulce a $O(M)$ je odhad časové složitosti ověření jedné podmínky (u objektů nalezneme vlastnost, o níž relace mluví, a pak v konstatním čase provedeme porovnání). Celkový počet operací lze tedy odhadnout jako $$O(N^P \times (M + Q \times A \times N \times M))$$
+Exponenciální složitost není, vzhledem k použití backtackingu, nijak překvapivá. Přesto však zkusme porovnat tento algoritmus s naivní implementací, kdy bychom postupně zkoušeli všechny možné konfigurace zaplnění tabulky a pokaždé kontrolovali platnost všech podmínek. Vychází nám odhad $O((N!)^M \times P \times A \times N \times M)$. 
+
+\section{Program}
+Následuje podrobný popis jednotlivých částí programu (resp. těch, které si podrobný komentář zaslouží).
+\begin{enumerate}
+\item \textbf{Přidání vlastnosti index}
+Trivální procedura \texttt{pridejIndex} přidá před zadaný seznam vlastností vlastnost \emph{index}.
+\item \textbf{Extrakce částečných objektů z podmínek a otázek} \\
+Hlavní procedury jsou \texttt{extrahujHodnotyZPodminek}, resp. \texttt{extrahujHodnotyZOtazek}. Prv\-ní zmíněná má dvě klauzule, jednu pro ošetření unárních pomínek, které ze senamu mažeme, a druhou pro relační podmínky, které ponecháme. Obě klauzule prochází seznam podmínek a na každou zavolají proceduru \texttt{extrahuj}. Ta má opět dvě verze. Pro unární podmínky jednoduše zavoláme proceduru \texttt{vytvorObjekt}, které předáme seznam dvojic \texttt{(Vlastnost, Hodnota)}. Pro relační potřebujeme vytvořit objektů více, procházíme tedy rekurzivně seznam v prvním argumentu podmínky a pro každou dvojici vytváříme nový objekt. Procedura \texttt{extrahuj} vrací pro každou podmínku seznam částečných objektů z ní vytvořených. 
+
+Procedura \texttt{vytvorObjekt} nejprve vytvoří prázdný objekt (= seznam volných proměnných délky $M$) a pak do něj v rekurzivní proceduře \texttt{vObjekt }dosazuje jednotlivé hodnoty pomocí predikátu \texttt{pridejHodnotu}.
+
+Procedura  \texttt{extrahujHodnotyZOtazek} je ještě jednodušší. Pro každou otázku vytváříme pouze jeden objekt, a to z dvojice \texttt{(Vlastnost, Hodnota)}, která tvoří první argument predikátu \texttt{otazka}. Stačí nám tedy přímočaře zavolat proceduru \texttt{vytvorObjekt}.
+
+\item \textbf{Sloučení částečných objektů shodujících se v nějaké vlastnosti} \\
+Hlavní procedurou je zde \texttt{zahusti}. Ta bere jako první argument seznam částečných objektů získaný v předchozím kroku a vrací jako druhý argument rovněž seznam částečných objektů, v němž jsou však již všechny objekty, jež se shodují v nějaké vlastnosti, sloučeny do jednoho. Procedura postupně bere jednotlivé objekty seznamu a snaží se je sloučit s některým ze zbytku seznamu. K tomu slouží procedura \texttt{zaclen}. Ta má 4 argumenty: začleňovaný objekt; seznam, do nějž začleňujeme; upravený seznam bez objektů, které se povedlo sloučit se začleňovaným; výsledný sloučený objekt. Procedura při korektním zadání uspěje vždy, tedy i pokud nelze začleňovaný objekt s ničím sloučit. Pak je jednoduše čtrvtý argument roven prvnímu (a třetí druhému). Jediný případ, kdy dojde k selhání, je v případě chybného zadání, kdy by jednomu objektu bylo přiděleno více hodnot  téže vlastnosti. 
+
+Procedura \texttt{zaclen} prochází seznam zbylých objektů a u každého zkouší, zda je možno jej sloučit se začleňovaným. K tomu slouží procedura \texttt{shodaVHodnote} \textbf{následovaná řezem}. Uspěje-li \texttt{zaclen}, nahradí začleňovaný objekt tímto novým sloučeným a pokračuje v procházení seznamu (toto je důležité pro případ, kdy v seznamu je hned několik objektů slučitelných do jednoho). Neshodují-li se řádky v nějaké hodnotě, pokračujeme dalším řádkem.
+
+Slučování probíhá následovně: \texttt{shodaVHodnote} projde oba řádky a pokusí se najít nějakou vlastnost, v níž objekty nabývají stejné hodnoty. Neuspěje-li, řádky nejsou kompatibilní a pokračujeme dál. Avšak v případě, že uspěje, znamená to nejen, že řádky lze sloučit, ale dokonce že řádky \textbf{musí jít} sloučit. Proto následuje operátor řezu a až potom operátor =, který se pokusí řádky unifikovat. V případě korektního zadání uspěje. Neúspěch totiž znamená, že některou z vlastností nelze unifikovat, což nastane tehdy, pokud oba objekty nabývají pro tuto vlastnost konkrétních a navzájem různých hodnot. Což indikuje chybu v zadání, neboť díky proceduře \texttt{shodaVHodnotě} již víme, že objekty se v nějaké hodnotě shodují.
+
+\item \textbf{Vytvoření prázdné tabulky}
+Tato část programu snad nevyžaduje příliš podrobný komentář. Za zmínku snad stojí jen to, že první sloupec tabulky (vlastnost \texttt{index}) je při konstrukci rovnou vyplněn čísly $1..N$.
+\item \textbf{Zaplnění tabulky} \\
+Jádro programu. Hlavní procedurou je \texttt{zaplnTabulku}. Ta vezme první ze seznamu částeč\-ných objektů, pokusí se jej vložit do tabulky procedurou \texttt{vlozObjekt}, zkontroluje platnost relačních podmínek procedurou \texttt{zkontroluj} a v případě úspěchu rekurzivně zavolá sama sebe na další částečný objekt. 
+
+Procedura \texttt{vlozObjekt} prochází tabulku řádek po řádku a snaží se najít takový, který by šel unifikovat z objektem, který se snaží začlenit. Nelze-li unifikovat, rekurzivně procházíme zbytek tabulky.
+
+Procedura \texttt{zkontroluj} rekurzivně prochází seznam podmínek a pro každou nejprve najde v tabulce řádky, jichž se podmínka týká, a následně zkontroluje platnost dané podmínky predikátem \texttt{plati}. Nepodaří-li se odpovídající řádky v tabulce najít, znamená to, že ještě v tabulce nejsou a tudíž podmínka rozhodně nebude porušena. V takovém případě nic neověřujeme a vezmeme další podmínku.
+
+Procedura \texttt{plati} aplikuje na seznam objektů postupně všechny relace dané druhým argumentem relační podmínky. K tomu poslouží zabudovaná procedura \texttt{apply}.
+
+\item \textbf{Nalezení odpovědí na otázky v tabulce} \\
+Procedura \texttt{zodpovez} prochází seznam otázek a na každou zavolá proceduru \texttt{zodp}. Ta nalezne v již vyplněné tabulce řádek odpovídající dvojici \texttt{(Vlastnost, Hodnota)} dané prvním argumentem predikátu \texttt{otazka} (predikát \texttt{najdiRadek}) a následně na tomto řádku nalezne hodnotu odpovídající vlastnosti dané druhým argumentem predikátu \texttt{otazka} (predikát \texttt{najdiHodnotu}).
+
+\item \textbf{Výpis řešení} \\
+Sada jednoduchých procedur vypíše na výstup vyplněnou tabulku a odpoví celými větami na zadané otázky. Tabulka může být neúplná (některé položky mohou být stále volné proměnné), což nám ovšem ani v nejmenším nebrání v nalezení řešení. Stisknutím středníku může uživatel odmítnout řešení a vyzvat program k nalezení dalšího. Za různá řešení považujeme ta, jejichž výsledné tabulky se liší. To znamená, že dvě různá řešení mohou mít stejné odpovědi na otázky (ale různé tabulky, tj. může se lišit např. pořadí objektů).
+
+\end{enumerate}
+
+\section{Testovací data}
+Součástí řešení jsou i vhodná testovací data umístěná v souboru \texttt{testovaci\_data.pl}. Volání probíhá pomocí unární procedury \texttt{testuj}, která bere za argument název konkrétního testovacího příkladu. Např. příkaz \texttt{testuj(original)} zavolá proceduru \texttt{zebra} s argumenty odpovídajícími orignálnímu zadání Einsteinovy hádanky. Testovací příklady nijak nevyužívají vyplněný seznam odpovědí v posledním argumentu, odpovědi jsou pouze vypsány pomocí naší definované procedury pro výpis.
+
+Poskytnuté testovací příklady jsou následující:
+\subsection{original}
+Již zmíněné originální zadání. Zní takto:
+\begin{framed}
+\begin{enumerate} \itemsep1pt \parskip0pt \parsep0pt
+\item There are five houses.
+\item The Englishman lives in the red house.
+\item The Spaniard owns the dog.
+\item Coffee is drunk in the green house.
+\item The Ukrainian drinks tea.
+\item The green house is immediately to the right of the ivory house.
+\item The Old Gold smoker owns snails.
+\item Kools are smoked in the yellow house.
+\item Milk is drunk in the middle house.
+\item The Norwegian lives in the first house.
+\item The man who smokes Chesterfields lives in the house next to the man with the fox. 
+\item Kools are smoked in the house next to the house where the horse is kept. 
+\item The Lucky Strike smoker drinks orange juice.
+\item The Japanese smokes Parliaments.
+\item The Norwegian lives next to the blue house.
+\end{enumerate}
+ Now, who drinks water? Who owns the zebra? In the interest of clarity, it must be added that each of the five houses is painted a different color, and their inhabitants are of different national extractions, own different pets, drink different beverages and smoke different brands of American cigarets. One other thing: in statement 6, right means your right. 
+\end{framed}
+Pro toto zadání existuje právě jedno řešení. Výsledná tabulka je kompletní (bez anonymních proměnných).
+
+\subsection{priklad1}
+Zde pouze ukazujeme korektnost zahušťování seznamu částečných objektů. Pro názornost je tento příklad ošetřen upravenou variantou hlavní procedury, a to s názvem \texttt{zebraSVypisem}. Jediná odlišnost je v tom, že v průběhu algoritmu dojde k vypsání seznamu objektů před a po zahuštění.
+
+Z podmínek se extrahují hned 4 objekty, shodující se ve vlastnosti \texttt{barva}. Na výpisech lze názorně vidět, že správně dojde ke sloučení všech 4 do jediného objektu.
+
+\subsection{priklad2}
+Rovněž příklad demonstrativního charakteru. Jedná se o originální hádanku s přidanou relační podmínkou, která udává vztah 12 objektů. Je tedy vidět, že některé dvojice \texttt{(Vlastnost, Hodnota)} mohou specifikovat týž objekt. Použili jsme vlastní proceduru \texttt{notFirst}, tentokrát s dvanácti argumenty, která uspěje, pokud ani jeden z 12 objektů daných argumenty není na první pozici. Díky vhodně zvoleným argumentům je výsledek příkladu stejný jako výsledek originální hádanky.
+
+\subsection{chyba1}
+Ukázka chybného zadání. Jedné vlastnosti téhož objektu (určeného hodnotou \texttt{zluta} vlastnosti \texttt{barva}) se snažíme v různých podmínkách přiřadit dvě různé hodnoty (v tomto konkrétním případě dvě různé značky cigaret).
+
+\subsection{chyba2}
+Další příklad chyby v zadání. Jedná se de facto o tutéž chybu jako předchozím případě, tentokrát však k pokusu o přiřazení různých hodnot téže vlastnosti dochází v rámci jediné unární podmínky.
+
+\subsection{books}
+Variace originální hádanky. Viz \url{http://brainden.com/einsteins-riddles.htm}. Zadání zní:
+\begin{framed}
+
+Another example of hard grid puzzles (just like Einstein's) was published in the QUIZ 11/1986.
+ Eight married couples meet to lend one another some books. Couples have the same surname, employment and car. Each couple has a favorite color. Furthermore we know the following facts: 
+\begin{enumerate} \itemsep1pt \parskip0pt \parsep0pt
+\item Daniella Black and her husband work as Shop-Assistants.
+\item The book "The Seadog" was brought by a couple who drive a Fiat and love the color red.
+\item Owen and his wife Victoria like the color brown.
+\item Stan Horricks and his wife Hannah like the color white.
+\item Jenny Smith and her husband work as Warehouse Managers and they drive a Wartburg.
+\item Monica and her husband Alexander borrowed the book "Grandfather Joseph".
+\item Mathew and his wife like the color pink and brought the book "Mulatka Gabriela".
+\item Irene and her husband Oto work as Accountants.
+\item The book "We Were Five" was borrowed by a couple driving a Trabant.
+\item The Cermaks are both Ticket-Collectors who brought the book "Shed Stoat".
+\item Mr and Mrs Kuril are both Doctors who borrowed the book "Slovacko Judge".
+\item Paul and his wife like the color green.
+\item Veronica Dvorak and her husband like the color blue.
+\item Rick and his wife brought the book "Slovacko Judge" and they drive a Ziguli.
+\item One couple brought the book "Dame Commissar" and borrowed the book "Mulatka Gabriela".
+\item The couple who drive a Dacia, love the color violet.
+\item The couple who work as Teachers borrowed the book "Dame Commissar".
+\item The couple who work as Agriculturalists drive a Moskvic.
+\item Pamela and her husband drive a Renault and brought the book "Grandfather Joseph".
+\item Pamela and her husband borrowed the book that Mr and Mrs Zajac brought.
+\item Robert and his wife like the color yellow and borrowed the book "The Modern Comedy".
+\item Mr and Mrs Swain work as Shoppers.
+\item "The Modern Comedy" was brought by a couple driving a Skoda.
+\end{enumerate}
+Is it a problem to find out everything about everyone from this information?
+\end{framed}
+Více objektů i jejich vlastností, podmínky jsou až na jedinou výjimku unární, s různým počtem dvojic \texttt{(Vlastnost, Hodnota)}. Hádanka rovněž neobsahuje žádnou otázku, výsledkem má být pouze kompletní tabulka. Zajímavostí je, že dvě vlastnosti (\texttt{brought} a \texttt{borrowed}) nabývají stejných hodnot. Toho lze využít pro zkompletování tabulky (která by pouze na základě podmínek obsahovala i volná místa), a to dodefinováním unárních podmínek s pouze jedinou vlastností, např. \texttt{podminka([(brought,the\_seadog)])}. Takto vlastně pouze předáme programu informaci o tom, že jedna z hodnot, kterých vlastnost \texttt{brought} nabývá, je i \texttt{the\_seadog}. Definujeme takové podmínky pro všechny knihy a pro obě vlastnosti \texttt{brought} a \texttt{borrowed}.
+
+Příklad rovněž ukazuje použití uživatelsky definované relace \texttt{borrow} (je definována v témže souboru). 
+
+Příklad je rozsahem větší a na výpočtu je to znát -- nalezení první odpovědi trvá několik vteřin. Poněkud nepříjemnou vlastností je to, že není požadováno specifické pořadí objektů. Náš program ovšem s pořadím pracuje a různá pořadí těch samých objektů považuje za různá řešení. Po stisku středníku bude tedy náš program zobrazovat postupně všechny permutace řádků téže tabulky.
+
+\subsection{heroes}
+Viz \url{http://answers.yahoo.com/question/index?qid=20111011084400AAjkXDH}. Tento příklad ukazuje použití hned několika uživatelsky definovaných relací. Nejčastěji je to způsobeno použitím negace v zadání, např \uv{The lance is \textbf{not} carried by the snake.} Tuto podmínku bohužel vzhledem ke způsobu výpočtu nelze považovat za unární a je nutno pomoct si speciálním predikátem.
+\begin{framed}
+Who are the heroes, what order do they stand, what armor do they wear, what sigil do they bear, how tall are they, what is their weapon of choice, and who bears the golden sigil?
+ NOTE: The heroes vary in height by 1 foot increments, 3 feet being the shortest hero. 
+\begin{enumerate} \itemsep1pt \parskip0pt \parsep0pt
+\item The lion stands in the middle
+\item The bearer of the white sigil is not the tallest or the shortest.
+\item The green sigil bearer is standing to the left of the black sigil bearer.
+\item The 3 foot tall hero carries a club.
+\item The fourth hero carries a spear.
+\item The hero carrying a sword is next to the hero carrying a club.
+\item The lance is not carried by the snake.
+\item The wearer of pink armor carries a dagger.
+\item The bear is the tallest.
+\item The hero beside the wolf carries a sword.
+\item 11. The hero in white armor is to the left and next to the hero with black armor.
+\item  The wolf carries a club.
+\item  The white sigil is adjacent to the red sigil.
+\item  The one that wears purple armor carries a spear
+\item  The wearer of the black armor is 3 feet tall.
+\item  The owl and the bear guard the outer sides.
+\item  The bearer of the red sigil is not the tallest
+ \item The wolf does not wear white armor or a white sigil.
+ \item The one who wears red armor is 6 feet tall.
+ \item The 4 foot tall hero is on the outer left and does not like to use swords.
+ \item The shortest hero carries a club.
+ \item The snake stands next to the hero with a black sigil.
+\item  The lion does not wear a black sigil.
+\end{enumerate}
+\end{framed}
+K hádance existují právě dvě řešení.
+
+\end{document}
